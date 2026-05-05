@@ -6,7 +6,7 @@ import os
 app = Flask(__name__)
 CORS(app)
 
-# ✅ FIX: add root route
+# Root route
 @app.route('/')
 def home():
     return "Backend is LIVE"
@@ -15,13 +15,20 @@ def home():
 def analyze():
     data = request.json
 
-    revenue = int(data.get("revenue"))
-    customers = int(data.get("customers"))
+    try:
+        revenue = int(data.get("revenue", 0))
+        customers = int(data.get("customers", 0))
+    except:
+        return jsonify({"error": "Invalid input"}), 400
 
     predicted_revenue = revenue + random.randint(5000, 20000)
 
-    # ✅ growth limit <= 100%
-    growth = int((predicted_revenue - revenue) / revenue * 100) if revenue > 0 else 0
+    # Growth calculation (max 100%)
+    if revenue > 0:
+        growth = int((predicted_revenue - revenue) / revenue * 100)
+    else:
+        growth = 0
+
     growth = min(growth, 100)
 
     insights = []
@@ -43,7 +50,7 @@ def analyze():
         "marketing": marketing
     })
 
-# ✅ deployment config
+# Deployment config
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
