@@ -12,7 +12,7 @@ export default function App() {
     if (!revenue || !customers) return;
     setLoading(true);
 
-    const res = await fetch("http://127.0.0.1:5000/analyze", {
+    const res = await fetch("https://ai-backend-ilfs.onrender.com/analyze", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ revenue, customers })
