@@ -4,16 +4,24 @@ import random
 import os
 
 app = Flask(__name__)
-CORS(app)
 
-# Root route
+# ✅ CORS fix
+CORS(app, resources={r"/*": {"origins": "*"}}, supports_credentials=True)
+
+# ✅ Root route (for testing)
 @app.route('/')
 def home():
     return "Backend is LIVE"
 
-@app.route('/analyze', methods=['POST'])
+# ✅ Analyze API
+@app.route('/analyze', methods=['POST', 'OPTIONS'])
 def analyze():
-    data = request.json
+
+    # ✅ Handle preflight request (important for browser)
+    if request.method == "OPTIONS":
+        return jsonify({"message": "OK"}), 200
+
+    data = request.get_json(silent=True) or {}
 
     try:
         revenue = int(data.get("revenue", 0))
@@ -23,7 +31,7 @@ def analyze():
 
     predicted_revenue = revenue + random.randint(5000, 20000)
 
-    # Growth calculation (max 100%)
+    # ✅ Growth calculation (max 100%)
     if revenue > 0:
         growth = int((predicted_revenue - revenue) / revenue * 100)
     else:
@@ -50,7 +58,7 @@ def analyze():
         "marketing": marketing
     })
 
-# Deployment config
+# ✅ Deployment config (REQUIRED for Render)
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
