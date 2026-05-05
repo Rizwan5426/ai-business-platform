@@ -12,10 +12,13 @@ export default function App() {
     if (!revenue || !customers) return;
     setLoading(true);
 
-    const res = await fetch("https://ai-backend-ilfs.onrender.com/analyze", {
+    const res = await fetch("https://ai-backend-i1fs.onrender.com/analyze", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ revenue, customers })
+      body: JSON.stringify({
+  revenue: Number(revenue),
+  customers: Number(customers)
+})
     });
 
     const data = await res.json();
